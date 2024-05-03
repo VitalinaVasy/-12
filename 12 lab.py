@@ -189,6 +189,10 @@ class Patient:
     def add_diagnosis(self, diagnosis):
         self._diagnosis_history.append(diagnosis)
 
+    def add_diagnosis_from_strings(self, diagnosis_name, diagnosis_description):
+        diagnosis = Diagnosis(diagnosis_name, diagnosis_description)
+        self.add_diagnosis(diagnosis)
+
     def __str__(self):
         return f"ID: {self.id}, Ім'я: {self.surname} {self.first_name} {self.middle_name}, Адреса: {self.address}, Телефон: {self.phone}, Номер медичної картки: {self.medical_card_number}, Історія хвороби: {self.diagnosis_history}"
 
@@ -205,25 +209,25 @@ class PatientDatabase:
     def add_doctor(self, doctor):
         self._doctors.append(doctor)
 
-    def get_patients_by_diagnosis(self, diagnosis):
-        return [patient for patient in self._patients if patient.diagnosis and patient.diagnosis.name == diagnosis]
-
-    def get_patients_by_medical_card_number_range(self, start, end):
-        return [patient for patient in self._patients if start <= patient.medical_card_number <= end]
-
     def display_patients(self, patients_list):
         for patient in patients_list:
-            print(patient)
+            diagnosis_info = ""
+            if patient.diagnosis_history:
+                diagnosis_info = ", ".join([f"{diagnosis.name}: {diagnosis.description}" for diagnosis in patient.diagnosis_history if isinstance(diagnosis, Diagnosis)])
+
+            print(f"Пацієнт: {patient}")
+#Діагнози: {diagnosis_info}
 
     def display_doctors(self):
         for doctor in self._doctors:
             print(doctor)
 
-    # Методи для роботи з прийомами
+    #Розклад зустрічей
     def schedule_appointment(self, patient, doctor, appointment_date):
         appointment = Appointment(patient, doctor, appointment_date)
         self._appointments.append(appointment)
 
+    #Перегляд історії пацієнта 
     def view_patient_history(self, patient_id):
         patient = self.find_patient_by_id(patient_id)
         if patient:
@@ -231,6 +235,7 @@ class PatientDatabase:
         else:
             print("Пацієнта з таким ID не знайдено.")
 
+    #Знаходить пацієнта по ID
     def find_patient_by_id(self, patient_id):
         for patient in self._patients:
             if patient.id == patient_id:
@@ -254,9 +259,9 @@ db.add_doctor(Doctor("Сидорова", "Ольга", "Вікторівна", "
 db.add_doctor(Doctor("Іванов", "Михайло", "Петрович", "Невролог"))
 
 #пацієнти
-db.add_patient(Patient("Ахремчюк", "Іван", "Іванович", "Пушкінська 10, Харків", "+380996356245"))
-db.add_patient(Patient("Забівко", "Олександер", "Андрійович", "Пр. Інженерний 10, Харків", "+380996358525"))
-db.add_patient(Patient("Надійко", "Ванеса", "Юрівна", "Пр. Інженерний 4, Харків", "380962366455"))
+db.add_patient(Patient("Ахремчюк", "Іван", "Іванович", "Пушкінська 10, Харків", "+380996356245", "ОРИ"))
+db.add_patient(Patient("Забівко", "Олександер", "Андрійович", "Пр. Інженерний 10, Харків", "+380996358525", "Короновірус"))
+db.add_patient(Patient("Надійко", "Ванеса", "Юрівна", "Пр. Інженерний 4, Харків", "380962366455", "Артріт"))
 
 
 while True:
